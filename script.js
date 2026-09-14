@@ -16,7 +16,7 @@ function slugify(value) {
   return String(value ?? "")
     .trim()
     .toLowerCase()
-    .replace(/['’]/g, "")
+    .replace(/['']/g, "")
     .replace(/\s+/g, "-");
 }
 
@@ -49,11 +49,15 @@ function formatCredit(value) {
   const credit = String(value ?? "").trim();
   if (!credit) return "Photo credit not provided";
 
+  // Try to extract URL in angle brackets: Text <URL>
   const match = credit.match(/^(.*?)\s*<((?:https?:\/\/)[^>]+)>\s*$/);
-  if (!match) return escapeHTML(credit);
+  if (match) {
+    const [, text, url] = match;
+    return `${escapeHTML(text.trim())} <a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">License</a>`;
+  }
 
-  const [, text, url] = match;
-  return `${escapeHTML(text.trim())} <a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">License</a>`;
+  // If no URL found, just escape and return the credit as-is
+  return escapeHTML(credit);
 }
 
 function showError(message) {
